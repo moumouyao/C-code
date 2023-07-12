@@ -9,7 +9,7 @@
 #define ROW  9
 #define COL  9
 //定义雷的个数
-#define EasyCount 10
+#define EasyCount 3
 //隐藏的棋盘
 #define ROWS  ROW + 2
 #define COLS  ROW + 2

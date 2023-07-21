@@ -1,0 +1,3 @@
+﻿  test.c
+D:\Visual Studio\c-code\学生信息管理\学生信息管理\test.c(774): warning C4715: “stu_print”: 不是所有的控件路径都返回值
+  学生信息管理.vcxproj -> D:\Visual Studio\c-code\学生信息管理\x64\Debug\学生信息管理.exe

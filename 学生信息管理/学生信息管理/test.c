@@ -1,10 +1,23 @@
 #define _CRT_SECURE_NO_WARNINGS 1
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 //宏定义
 #define length 100	//系统学生容量
 #define id_len 2	//id长度
+//// 定义汉字编码范围
+//#define GB2312_START 0xB0A1 
+//#define GB2312_END 0xF7FE
+//
+//#define GBK_START 0x4E00
+//#define GBK_END 0x9FFF 
+//
+//#define UTF8_START 0x4E00  
+//#define UTF8_END 0x9FFF
+//
+//// 定义编码格式
+//#define ENCODING "GB2312"
 
 struct stu {	//声明结构体类型
 	int id;
@@ -29,6 +42,7 @@ int sort_stu_info(struct stu stu_info[], int mode);
 int* stu_print(struct stu stu_info[], int mode);
 int isChineseString(char* str);
 int check_stu_id(int id);
+void id_delete(struct stu stu_info[], struct stu d_stu);
 
 int main() {
 	int input = 0;	//接收menu()函数返回值
@@ -36,13 +50,14 @@ int main() {
 	char ch = 0;	//判断
 	struct stu stu_info[length] = { 0 };	//定义结构体数组，用于存储学生信息
 	int* re = NULL;		//接收返回地址
+	int id = 0;
 
 	do {
 		input = menu();
 
 		switch (input) {
 		case 1: {		//查询学生信息
-			int id = 0;
+			id = 0;
 			printf("请输入要查询的学号：\n");
 			scanf("%d", &id);
 			while ((getchar()) != '\n' ) {}
@@ -56,7 +71,7 @@ int main() {
 
 		case 2: {	//录入学生信息
 			while (1) {
-				int id = input_stu_info(stu_info);
+				id = input_stu_info(stu_info);
 				if (id == -3) {
 					printf("已取消录入\n");
 				}
@@ -193,7 +208,7 @@ int my_printf(struct stu stu_info[], int id) {
 		return -1;
 	else
 
-	printf("学号：%d\t 姓名：%s\t 性别：%s\t 分数：%.2f\n",
+	printf("学号：%04d\t 姓名：%-5s\t 性别：%-4s\t 分数：%.2f\n",
 		stu_info[id].id, stu_info[id].name, stu_info[id].sex, stu_info[id].score
 	);
 	return id;
@@ -279,7 +294,7 @@ int* get_stu_name_info(struct stu stu_info[], char* pn) {
  
 	static int num[length] = { 0 };
 	int n = 1;
-	memset(num, 10, sizeof(num));
+	memset(num, 0, sizeof(num));
 	for (int i = 0; i < count; i++) {	//查找结构体中是否有此名字
 		if (strcmp(pn,stu_info[i].name) == 0) {
 			num[n] = i;
@@ -305,7 +320,7 @@ int input_stu_info(struct stu stu_info[]) {
 	//读入id
 	while (1) {
 		printf("请创建学生id:\n");
-		scanf("%02d", &id);
+		scanf("%d", &id);
 		while ((getchar()) != '\n') {}
 		if (-1 != get_stu_info(stu_info, id)) {	//判断id是否合法
 			printf("该学号已被占用\n");
@@ -506,6 +521,35 @@ void delete(struct stu stu_info[]) {
 			}
 		}
 		switch (n) {
+		case 2: {	//按姓名查找
+			printf("请输入需要删除学生的姓名：\n");
+			scanf("%s", d_stu.name);
+			while ((getchar()) != '\n') {}
+			num = get_stu_name_info(stu_info, d_stu.name);	//获取数组下表
+			if (*num == 0) {							//输入学号错误
+				printf("姓名输入错误或该学生不存在\n");
+				printf("是否重新输入（y/n）：\n");
+				scanf("%c", &ch);
+				if (ch == 'y' || ch == 'Y')
+					continue;
+				else
+					break;
+			}
+			else {			////输入学号正确
+					j = 1;
+					for (int i = 1; i <= *num; i++) {
+						/*if (m != -1 && i < *num) {
+							printf("%d.\t", j++);
+						}*/
+						m = my_printf(stu_info, *(num + i));	//打印相同姓名的学生
+
+					}
+
+
+			}
+
+
+		}
 		case 1: {	//按学号查找
 			while (1) {
 				printf("请输入需要删除学生的学号：\n");
@@ -522,109 +566,18 @@ void delete(struct stu stu_info[]) {
 						break;
 				}
 				else {			////输入学号正确
-					if (count == 1) {
-						stu_info[count - 1].id = 0;
-						memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
-						memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
-						stu_info[count - 1].score = 0;
-						count--;
+					id_delete(stu_info, d_stu);	//根据学号删除学号删除
 						printf("删除完毕，是否继续删除（y/n）：");
 						scanf("%c", &ch);
 						if (ch == 'y' || ch == 'Y')
 							continue;
 						else
 							break;
-					}
-					else {
-						stu_info[d_stu.id] = stu_info[count - 1];	//最后一名学生的信息覆盖需要删除的学生，达到删除效果
-						stu_info[count - 1].id = 0;
-						memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
-						memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
-						stu_info[count - 1].score = 0;
-						count--;
-						printf("删除完毕，是否继续删除（y/n）：");
-						scanf("%c", &ch);
-						if (ch == 'y' || ch == 'Y')
-							continue;
-						else
-							break;
-					}
-				
-
-				}
-					
+				}	
 			}
 			break;
-			
 		}
-		case 2: {	//按姓名查找
-			printf("请输入需要删除学生的姓名：\n");
-			scanf("%s", d_stu.name);
-			while ((getchar()) != '\n' ) {}
-			num = get_stu_name_info(stu_info, d_stu.name);	//获取数组下表
-			if (*num == 0) {							//输入学号错误
-				printf("姓名输入错误或该学生不存在\n");
-				printf("是否重新输入（y/n）：\n");
-				scanf("%c", &ch);
-				if (ch == 'y' || ch == 'Y')
-					continue;
-				else
-					break;
-			}
-			else {			////输入学号正确
-				while (1) {
-					j = 1;
-					for (int i = 1; i <= *num; i++) {
-						
-						m = my_printf(stu_info, *(num + i));	//打印相同姓名的学生
-						if (m != -1) {
-							printf("%d.\n", j++);
-						}
-					}
-					printf("请输入想要删除学生的 序号：\n");
-					scanf("%d", &n);
-					while ((getchar()) != '\n' ) {}
-					if (n<1 || n > *num) {
-						printf("输入错误，请重新输入：\n");
-						continue;
-					}
-					else
-						break;
-				}
-				if (n == 1 && count == 1) {
-					stu_info[count - 1].id = 0;
-					memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
-					memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
-					stu_info[count - 1].score = 0;
-					count--;
-					printf("删除完毕，是否继续删除（y/n）：");
-					scanf("%c", &ch);
-					if (ch == 'y' || ch == 'Y')
-						continue;
-					else
-						break;
-				}
-				else {
-					stu_info[*(num + n)] = stu_info[count - 1];	//最后一名学生的信息覆盖需要删除的学生，达到删除效果
-					stu_info[count - 1].id = 0;
-					memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
-					memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
-					stu_info[count - 1].score = 0;
-					count--;
-					printf("删除完毕，是否继续删除（y/n）：");
-					scanf("%c", &ch);
-					if (ch == 'y' || ch == 'Y')
-						continue;
-					else
-						break;
-				}
 
-
-			}
-
-		
-			break;
-		}
 		}
 
 	} while (n);
@@ -757,11 +710,22 @@ int* stu_print(struct stu stu_info[], int mode) {
 		}
 		//查找
 		memset(n, 0, sizeof(n));
-		for (int i = 0; i < count; i++) {
-			if (strcmp(stu_info[i].sex, "男") == 0) {
-				n[j] = i;
-				n[0]++;
-				j++;
+		if (j == 1) {
+			for (int i = 0; i < count; i++) {
+				if (strcmp(stu_info[i].sex, "男") == 0) {
+					n[j] = i;
+					n[0]++;
+					j++;
+				}
+			}
+		}
+		else if (j == 2) {
+			for (int i = 0; i < count; i++) {
+				if (strcmp(stu_info[i].sex, "女") == 0) {
+					n[j] = i;
+					n[0]++;
+					j++;
+				}
 			}
 		}
 		return n;
@@ -780,12 +744,39 @@ int* stu_print(struct stu stu_info[], int mode) {
 				0	非纯中文
 				1	纯中文
 */
+// 判断中文字符
+//int isChineseChar(short c) {
+//	if (ENCODING == "GB2312") {
+//		return c >= GB2312_START && c <= GB2312_END;
+//	}
+//	else if (ENCODING == "GBK") {
+//		return c >= GBK_START && c <= GBK_END;
+//	}
+//	else if (ENCODING == "UTF-8") {
+//		return c >= UTF8_START && c <= UTF8_END;
+//	}
+//}
+
+// 判断字符串是否全为中文
 int isChineseString(char* str) {
+	//char* p = str;
+	//while (*str != '\0') {
+	//	short ch = *(short*)p; // 取两个字节
+	//		
+	//	
+	//	if (!isChineseChar(ch)) {
+	//		return 0;
+	//	}
+	//	str = str + 3;
+	//}
+	//return 1;
 	while (*str != '\0') {
-		if ((*str >= 0xA1 && *str <= 0xF9)) {
+
+
+		if (!(*str > 127 || *str < 0)) {
 			return 0;
 		}
-		str++;
+		str = str + 1;
 	}
 	return 1;
 }
@@ -815,4 +806,27 @@ int check_stu_id(int id) {
 		return dig;
 	}
 
+}
+
+/*
+	功能：根据学号删除学生信息
+	参数：struct stu stu_info[] 学生信息结构体组, struct stu d_stu 存放需要删除的学生信息
+	返回值：无
+*/
+void id_delete(struct stu stu_info[], struct stu d_stu) {
+	if (count == 1 || count - 1 == d_stu.id) {
+		stu_info[count - 1].id = 0;
+		memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
+		memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
+		stu_info[count - 1].score = 0;
+		count--;
+	}
+	else {
+		stu_info[d_stu.id] = stu_info[count - 1];	//最后一名学生的信息覆盖需要删除的学生，达到删除效果
+		stu_info[count - 1].id = 0;
+		memset(stu_info[count - 1].name, 0, sizeof(stu_info[count - 1].name));
+		memset(stu_info[count - 1].sex, 0, sizeof(stu_info[count - 1].sex));
+		stu_info[count - 1].score = 0;
+		count--;
+	}
 }

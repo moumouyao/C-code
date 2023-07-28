@@ -1,0 +1,4 @@
+﻿  stu_link.c
+D:\Visual Studio\c-code\学生信息管理系统\学生信息管理系统\stu_link.c(157,18): warning C4133: “=”: 从“stu_link *”到“char *”的类型不兼容
+D:\Visual Studio\c-code\学生信息管理系统\学生信息管理系统\stu_link.c(302,20): warning C4133: “=”: 从“stu_link *”到“char *”的类型不兼容
+  学生信息管理系统.vcxproj -> D:\Visual Studio\c-code\学生信息管理系统\x64\Debug\学生信息管理系统.exe

@@ -12,7 +12,8 @@ enum opt menu() {
         printf("%d.删除学生信息\n", DELETE);
         printf("%d.修改学生信息\n", MOD);
         printf("%d.学生信息排序\n", SORT);
-        printf("%d.退出系统", EXIT);
+        printf("%d.学生信息查询\n", REFER);
+        printf("%d.退出系统\n", EXIT);
         printf("请输入相应标号\n");
         scanf("%d", (int*)&num);
         while (getchar() != '\n');

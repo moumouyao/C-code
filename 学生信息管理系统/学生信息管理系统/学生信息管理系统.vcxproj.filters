@@ -24,12 +24,18 @@
     <ClCompile Include="stu_link.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="File_stu.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="menu.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="stu_link.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="File_stu.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

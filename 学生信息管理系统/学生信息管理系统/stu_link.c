@@ -4,6 +4,8 @@
 #include "stu_link.h"
 #include <stdlib.h>
 #include <string.h>
+#include "File_stu.h"
+
 extern STU_LINK* Ph;
 int count = 0;
 
@@ -62,6 +64,7 @@ STU_LINK* check_id(STU_LINK* phead, int id) {
  **/
 void add_info(STU_LINK* phead) {
     int id = 0;
+    int ret = 1;
     STU_LINK* pnew = NULL;
     STU_LINK* ptmp = phead;
     while (1) {   //读入学号并查重
@@ -74,10 +77,23 @@ void add_info(STU_LINK* phead) {
         }
         else {
             clearScreen();
-            printf("该学号已被占用\n");
+            printf("学号为%d的学生已存在\n", id);
+
+            sprintf(err_name, "添加信息");
+            sprintf(err_buf, "id已经存在");
+            history_info(err_name, err_buf);
+       
+
         }
     }
     pnew = add_link(phead);
+    if (pnew == NULL)
+    {
+        printf("空间开辟失败\n");
+        sprintf(err_name, "添加信息");
+        sprintf(err_buf, "空间开辟失败");
+        history_info(err_name, err_buf);
+    }
     pnew->s.id = id;
     printf("请输入姓名\n");
     scanf("%s", pnew->s.name);
@@ -89,6 +105,10 @@ void add_info(STU_LINK* phead) {
     scanf("%f", &pnew->s.score);
     clear();
     printf("添加成功\n");
+
+    sprintf(err_name, "添加信息");
+    sprintf(err_buf, "添加成功");
+    history_info(err_name, err_buf);
 
 }
 /**
@@ -179,6 +199,9 @@ void name_c_c() {
         if (*(int*)p == 0) {
             clearScreen();
             printf("查无此人\n");
+            sprintf(err_name, "按姓名查询学生信息");
+            sprintf(err_buf, "查无此人");
+            history_info(err_name, err_buf);
             while (1) {
                 printf("1.继续查询\n");
                 printf("2.退出\n");
@@ -207,6 +230,11 @@ void name_c_c() {
                     (*((STU_LINK * *)p + i))->s.score
                 );
             };
+
+            sprintf(err_name, "按姓名查询学生信息");
+            sprintf(err_buf, "查询成功");
+            history_info(err_name, err_buf);
+
             while (1) {
                 printf("1.继续查询\n");
                 printf("2.退出\n");
@@ -257,6 +285,10 @@ void id_c_c() {
         ptmp = id_c(Ph, id);
         if (ptmp == NULL) {
             printf("查无此号\n");
+
+            sprintf(err_name, "按学号查询学生信息");
+            sprintf(err_buf, "查无此号");
+            history_info(err_name, err_buf);
         }
         else {
             printf("学号\t姓名\t性别\t分数\n");
@@ -266,6 +298,10 @@ void id_c_c() {
                 ptmp->s.sex,
                 ptmp->s.score
             );
+
+            sprintf(err_name, "按学号查询信息");
+            sprintf(err_buf, "查询成功");
+            history_info(err_name, err_buf);
         }
         while (1) {
             printf("1.继续查询\n");
@@ -338,6 +374,10 @@ void score_c_c() {
             clear();
             if (beg_sco < sbeg_sco || beg_sco > send_sco || end_sco < sbeg_sco || end_sco > send_sco || beg_sco > end_sco) {
                 printf("成绩区间非法，请重新输入\n");
+
+                sprintf(err_name, "按分数区间查询学生信息");
+                sprintf(err_buf, "分数区间非法");
+                history_info(err_name, err_buf);
             }
             else
                 break;
@@ -357,6 +397,9 @@ void score_c_c() {
             ptmp = ptmp->pnext;
 
         }
+        sprintf(err_name, "按分数段查询学生信息");
+        sprintf(err_buf, "查询成功");
+        history_info(err_name, err_buf);
         while (1) {
             printf("输入 Y 继续查询\n");
             scanf("%c", &ch);
@@ -430,6 +473,11 @@ void change_stu_info(STU_LINK* phead) {
         ptmp = id_c(Ph, id);
         if (ptmp == NULL) {
             printf("查无此号\n");
+
+            sprintf(err_name, "修改学生信息");
+            sprintf(err_buf, "查无此号");
+            history_info(err_name, err_buf);
+
             printf("按 Y 继续查询\n");
             ch = 0;
             scanf("%c", &ch);
@@ -470,6 +518,10 @@ void change_stu_info(STU_LINK* phead) {
                 clear();
                 if (n_stu.id <= 0) {
                     printf("新的学号非法\n");
+
+                    sprintf(err_name, "修改学生信息");
+                    sprintf(err_buf, "新的学号非法");
+                    history_info(err_name, err_buf);
                     
                     break;
                 }
@@ -484,10 +536,17 @@ void change_stu_info(STU_LINK* phead) {
                         ptmp->s.sex,
                         ptmp->s.score
                     );
+                    sprintf(err_name, "修改学生信息");
+                    sprintf(err_buf, "学号修改成功");
+                    history_info(err_name, err_buf);
                     break;
                 }
                 else {
                     printf("该学号已经被使用\n");
+
+                    sprintf(err_name, "修改学生信息");
+                    sprintf(err_buf, "新的学号已被使用");
+                    history_info(err_name, err_buf);
                     break;
                 }
 
@@ -505,6 +564,10 @@ void change_stu_info(STU_LINK* phead) {
                     ptmp->s.sex,
                     ptmp->s.score
                 );
+
+                sprintf(err_name, "修改学生信息");
+                sprintf(err_buf, "姓名修改成功");
+                history_info(err_name, err_buf);
                 break;
             }
             case 3: {	//修改性别
@@ -520,6 +583,10 @@ void change_stu_info(STU_LINK* phead) {
                     ptmp->s.sex,
                     ptmp->s.score
                 );
+
+                sprintf(err_name, "修改学生信息");
+                sprintf(err_buf, "性别修改成功");
+                history_info(err_name, err_buf);
                 break;
             }
             case 4: {	//修改分数
@@ -535,6 +602,9 @@ void change_stu_info(STU_LINK* phead) {
                     ptmp->s.sex,
                     ptmp->s.score
                 );
+                sprintf(err_name, "修改学生信息");
+                sprintf(err_buf, "分数修改成功");
+                history_info(err_name, err_buf);
                 break;
             }
             case 0: {
@@ -636,6 +706,11 @@ void delete_c (STU_LINK* phead) {
                 if (ptmp == NULL) {
                     clearScreen();
                     printf("查无此号\n");
+
+                    sprintf(err_name, "删除学生信息");
+                    sprintf(err_buf, "查无此号");
+                    history_info(err_name, err_buf);
+
                     printf("是否继续查找（y/n）\n");
                     scanf("%c", &ch);
                     clear();
@@ -657,7 +732,7 @@ void delete_c (STU_LINK* phead) {
                         ptmp->s.sex,
                         ptmp->s.score
                     );
-                    break;
+                    
                 }
                 printf("输入 Y 确定删除\n");
                 scanf("%c", &ch);
@@ -667,9 +742,21 @@ void delete_c (STU_LINK* phead) {
                     delete(phead, id);
                     count--;
                     printf("删除成功\n");
+                    sprintf(err_name, "删除学生信息");
+                    sprintf(err_buf, "按学号删除成功");
+                    history_info(err_name, err_buf);
                 }
                 else {
                     clearScreen();
+                    
+                }
+                printf("输入 Y 继续按学号删除\n");
+                scanf("%c", &ch);
+                clear();
+                if (ch == 'y' || ch == 'Y') {
+                    continue;
+                }
+                else {
                     break;
                 }
             }
@@ -689,6 +776,11 @@ void delete_c (STU_LINK* phead) {
                     if (*(int*)p == 0) {
                         clearScreen();
                         printf("查无此人\n");
+
+                        sprintf(err_name, "删除学生信息");
+                        sprintf(err_buf, "查无此人");
+                        history_info(err_name, err_buf);
+
                         while (1) {
                             printf("1.继续查询\n");
                             printf("2.退出\n");
@@ -737,6 +829,9 @@ void delete_c (STU_LINK* phead) {
                                         delete(phead, id);
                                         count--;
                                         printf("删除成功\n");
+                                        sprintf(err_name, "删除学生信息");
+                                        sprintf(err_buf, "按姓名删除成功");
+                                        history_info(err_name, err_buf);
                                         break;
                                     }
                                     else {

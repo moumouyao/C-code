@@ -11,10 +11,10 @@ STU_LINK* Ph;
 int main()
 {
     
-    Ph = (STU_LINK*)malloc(sizeof(STU_LINK));
+   // Ph = (STU_LINK*)malloc(sizeof(STU_LINK));
     int num = 0;
-    memset(Ph, 0, sizeof(STU_LINK));
-    read_stu_info(Ph);
+  //  memset(Ph, 0, sizeof(STU_LINK));
+    read_stu_info(&Ph);
  
     do {
         num = menu();
@@ -37,7 +37,8 @@ int main()
             break;
         }
         case SORT: {
-            
+            sort_c(Ph);
+          //  clearScreen();
             break;
         }
         case REFER: {

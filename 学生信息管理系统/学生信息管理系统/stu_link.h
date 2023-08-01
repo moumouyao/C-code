@@ -1,6 +1,11 @@
 #pragma once
 #ifndef _STU_LINK_H_
 #define _STU_LINK_H_
+
+#define id_len 4	//id长度
+#define length 10000    //最大存储量
+#define f_score 1000    //满分
+
 //定义结构体类型
 typedef struct {
     int id;
@@ -12,7 +17,8 @@ typedef struct {
 typedef struct  stu_link
 {
     stu s;              //数据域
-    struct stu_link* pnext;    //地址域
+    struct stu_link* pnext;    //下一个节点地址
+    struct stu_link* plast;    //上一个节点地址
 }STU_LINK;
 //定义枚举类型
 enum check_opt {
@@ -35,4 +41,8 @@ void sex_c(STU_LINK* phead);
 void change_stu_info(STU_LINK* phead);
 int delete(STU_LINK* phead, int id);
 void delete_c(STU_LINK* phead);
+void sort_c(STU_LINK* phead);
+void sort_id(STU_LINK* phead);
+int isChineseString(char* str);
+int check_stu_id(int id);
 #endif

@@ -30,6 +30,7 @@ STU_LINK* add_link(STU_LINK* phead) {
         ptmp = ptmp->pnext;
     }
     if (ptmp->pnext = (STU_LINK*)malloc(sizeof(STU_LINK))) {    //开辟空间
+        
         count++;
         printf("创建成功\n%p\n", ptmp);
     }
@@ -38,6 +39,7 @@ STU_LINK* add_link(STU_LINK* phead) {
         return NULL;
     }
     memset(ptmp->pnext, 0, sizeof(STU_LINK));//初始化
+    ptmp->pnext->plast = ptmp;
     return ptmp->pnext;
 }
 
@@ -71,6 +73,10 @@ void add_info(STU_LINK* phead) {
         printf("请输入学号\n");
         scanf("%d", &id);
         clear();
+         if (id <= 0 || check_stu_id(id) != id_len) {
+            printf("请输入 1---%d 范围内的学号\n", length - 1);
+            continue;
+        }
         if (check_id(phead, id)) {
             printf("创建学号成功\n");
             break;
@@ -94,16 +100,64 @@ void add_info(STU_LINK* phead) {
         sprintf(err_buf, "空间开辟失败");
         history_info(err_name, err_buf);
     }
-    pnew->s.id = id;
-    printf("请输入姓名\n");
-    scanf("%s", pnew->s.name);
+    pnew->s.id = id;    //读入id
+    while (1) {
+        printf("请输入姓名\n");
+        scanf("%s", pnew->s.name);
+        clear();
+        if (isChineseString(pnew->s.name) == 0) {
+            printf("输入的姓名非纯中文，请重新输入\n");
+        }
+        else if (isChineseString(pnew->s.name) == 1) {
+            break;
+        }
+    }
+    
 
-    clear();
-    printf("请输入性别\n");
-    scanf("%s", pnew->s.sex);
-    printf("请输入成绩\n");
-    scanf("%f", &pnew->s.score);
-    clear();
+    //读入性别
+    while (1) {
+        ret = 0;
+        printf("请选择学生性别：\n");
+        printf("1.男性\n");
+        printf("2.女性\n");
+     // printf("3.退出\n");
+        scanf("%d", &ret);
+        while ((getchar()) != '\n') {}
+        if (ret != 1 && ret != 2) {
+            printf("非法输入，请重新选择\n");
+        }
+        else
+            break;
+    }
+    switch (ret) {
+    case 1: {
+        strncpy(pnew->s.sex, "男", 15);
+        break;
+    }
+    case 2: {
+        strcpy(pnew->s.sex, "女");
+        break;
+    }
+    //case 3: {	//删除
+    //    stu_info[count] = stu_info[count + 1];//置零
+    //    return -3;
+    //}
+    }
+
+   
+    
+    do {
+
+        printf("请输入学生分数:\n");
+        scanf("%f", &pnew->s.score);
+        clear();
+        if (pnew->s.score <= 0 || pnew->s.score > 1000) {
+            printf("分数必须在0-%d之间!\n",f_score);
+        }
+        else {
+            break;
+        }
+    } while (1);
     printf("添加成功\n");
 
     sprintf(err_name, "添加信息");
@@ -223,7 +277,7 @@ void name_c_c() {
             printf("一共由%d个相同姓名的学生\n", *(long*)p);
             printf("学号\t姓名\t性别\t分数\n");
             for (i = 1; i <= *(long*)p; i++) {
-                printf("%d\t%s\t%s\t%f\n",
+                printf("%d\t%s\t%s\t%.2f\n",
                     (*((STU_LINK**)p + i))->s.id,
                     (*((STU_LINK * *)p + i))->s.name,
                     (*((STU_LINK * *)p + i))->s.sex,
@@ -292,7 +346,7 @@ void id_c_c() {
         }
         else {
             printf("学号\t姓名\t性别\t分数\n");
-            printf("%d\t%s\t%s\t%f\n",
+            printf("%d\t%s\t%s\t%.2f\n",
                 ptmp->s.id,
                 ptmp->s.name,
                 ptmp->s.sex,
@@ -365,7 +419,7 @@ void score_c_c() {
     send_sco = ptmp->s.score;
     while (1) {
         while (1) {//读入区间并判断是否合法
-            printf("学生的成绩区间为：%f ---- %f\n", sbeg_sco, send_sco);
+            printf("学生的成绩区间为：%.2f ---- %.2f\n", sbeg_sco, send_sco);
             printf("请输入起始分数线\n");
             scanf("%f", &beg_sco);
             clear();
@@ -386,7 +440,7 @@ void score_c_c() {
         printf("学号\t姓名\t性别\t分数\n");
         while (ptmp->pnext) {
             if (ptmp->pnext->s.score <= end_sco && ptmp->pnext->s.score >= beg_sco) {
-                printf("%d\t%s\t%s\t%f\n",
+                printf("%d\t%s\t%s\t%.2f\n",
                     ptmp->pnext->s.id,
                     ptmp->pnext->s.name,
                     ptmp->pnext->s.sex,
@@ -449,6 +503,35 @@ void sort_score(STU_LINK* phead) {
 }
 
 /**
+*功能:按学号升序排列
+**/
+
+void sort_id(STU_LINK* phead) {
+    STU_LINK* ptmp = phead->pnext;
+    stu date = { 0 };
+    for (int i = 1; i <= count - 1; i++) {
+        ptmp = phead;
+        for (int j = 1; j <= count; j++) {
+            if (ptmp->pnext == NULL) {
+                break;
+            }
+            if (ptmp->s.id > ptmp->pnext->s.id) {
+                date = ptmp->s;
+                ptmp->s = ptmp->pnext->s;
+                ptmp->pnext->s = date;
+            }
+
+            if (ptmp->pnext->pnext == NULL) {
+                break;
+            }
+            ptmp = ptmp->pnext;
+
+        }
+    }
+
+}
+
+/**
 *功能:按性别查找
 **/
 
@@ -493,7 +576,7 @@ void change_stu_info(STU_LINK* phead) {
         }
         else {
             printf("学号\t姓名\t性别\t分数\n");
-            printf("%d\t%s\t%s\t%f\n",
+            printf("%d\t%s\t%s\t%.2f\n",
                 ptmp->s.id,
                 ptmp->s.name,
                 ptmp->s.sex,
@@ -530,7 +613,7 @@ void change_stu_info(STU_LINK* phead) {
                     clearScreen();
                     printf("修改成功\n");
                     printf("学号\t姓名\t性别\t分数\n");
-                    printf("%d\t%s\t%s\t%f\n",
+                    printf("%d\t%s\t%s\t%.2f\n",
                         ptmp->s.id,
                         ptmp->s.name,
                         ptmp->s.sex,
@@ -558,7 +641,7 @@ void change_stu_info(STU_LINK* phead) {
                 clearScreen();
                 printf("姓名修改成功\n");
                 printf("学号\t姓名\t性别\t分数\n");
-                printf("%d\t%s\t%s\t%f\n",
+                printf("%d\t%s\t%s\t%.2f\n",
                     ptmp->s.id,
                     ptmp->s.name,
                     ptmp->s.sex,
@@ -577,7 +660,7 @@ void change_stu_info(STU_LINK* phead) {
                 clearScreen();
                 printf("性别修改成功\n");
                 printf("学号\t姓名\t性别\t分数\n");
-                printf("%d\t%s\t%s\t%f\n",
+                printf("%d\t%s\t%s\t%.2f\n",
                     ptmp->s.id,
                     ptmp->s.name,
                     ptmp->s.sex,
@@ -596,7 +679,7 @@ void change_stu_info(STU_LINK* phead) {
                 clearScreen();
                 printf("分数修改成功\n");
                 printf("学号\t姓名\t性别\t分数\n");
-                printf("%d\t%s\t%s\t%f\n",
+                printf("%d\t%s\t%s\t%.2f\n",
                     ptmp->s.id,
                     ptmp->s.name,
                     ptmp->s.sex,
@@ -726,7 +809,7 @@ void delete_c (STU_LINK* phead) {
                 }
                 else {
                     printf("学号\t姓名\t性别\t分数\n");
-                    printf("%d\t%s\t%s\t%f\n",
+                    printf("%d\t%s\t%s\t%.2f\n",
                         ptmp->s.id,
                         ptmp->s.name,
                         ptmp->s.sex,
@@ -801,7 +884,7 @@ void delete_c (STU_LINK* phead) {
                         printf("一共由%d个相同姓名的学生\n", *(long*)p);
                         printf("学号\t姓名\t性别\t分数\n");
                         for (i = 1; i <= *(long*)p; i++) {
-                            printf("%d\t%s\t%s\t%f\n",
+                            printf("%d\t%s\t%s\t%.2f\n",
                                 (*((STU_LINK**)p + i))->s.id,
                                 (*((STU_LINK**)p + i))->s.name,
                                 (*((STU_LINK**)p + i))->s.sex,
@@ -815,7 +898,7 @@ void delete_c (STU_LINK* phead) {
                             clear();
                             for (i = 1; i <= *(long*)p; i++) {
                                 if ((*((STU_LINK**)p + i))->s.id == id) {
-                                    printf("%d\t%s\t%s\t%f\n",
+                                    printf("%d\t%s\t%s\t%.2f\n",
                                         (*((STU_LINK**)p + i))->s.id,
                                         (*((STU_LINK**)p + i))->s.name,
                                         (*((STU_LINK**)p + i))->s.sex,
@@ -881,6 +964,7 @@ void delete_c (STU_LINK* phead) {
 void sort_c(STU_LINK* phead) {
     int num = 0;
     char ch = 0;
+    STU_LINK* ptmp = phead;
     while (1) { //输入判定
         printf("请选择排序方式\n");
         printf("1.按成绩排序\n");
@@ -905,13 +989,90 @@ void sort_c(STU_LINK* phead) {
             break;
         }
     }
+    //功能实现
     switch (num) {
+        //按成绩排列
     case 1: {
         while (1) {
             num = 0;
             ch = 0;
             printf("请选择排序顺序\n");
             printf("1.按成绩升序排序\n");
+            printf("2.按降序降序排序\n");
+            printf("3.退出\n");
+            scanf("%d", &num);
+            clear();
+            if (num != 1 && num != 2 && num != 3) {
+                printf("非法输入，按 Y 重新选择\n");
+                scanf("%c", &ch);
+                if (ch == 'y' || ch == 'Y') {
+                    clearScreen();
+                    continue;
+                }
+                else {
+                    clearScreen();
+                    break;
+                }
+            }
+            else {
+                clearScreen();
+                break;
+            }
+        }
+        sort_score(phead);
+        switch (num) {
+        case 1: {   //成绩升序
+            ptmp = phead;
+            
+            printf("学号\t姓名\t性别\t分数\n");
+            while (ptmp->pnext) {
+              
+                    printf("%d\t%s\t%s\t%.2f\n",
+                        ptmp->pnext->s.id,
+                        ptmp->pnext->s.name,
+                        ptmp->pnext->s.sex,
+                        ptmp->pnext->s.score
+                    );
+                
+
+                ptmp = ptmp->pnext;
+
+            }
+
+            break;
+        }
+        case 2: {   //成绩降序
+            ptmp = phead;
+            while (ptmp->pnext) {//寻找尾节点
+                ptmp = ptmp->pnext;
+            }
+            printf("学号\t姓名\t性别\t分数\n");
+            while (ptmp->plast) {
+                printf("%d\t%s\t%s\t%.2f\n",
+                    ptmp->s.id,
+                    ptmp->s.name,
+                    ptmp->s.sex,
+                    ptmp->s.score
+                );
+                ptmp = ptmp->plast;
+            }
+
+            break;
+        }
+        case 3: {
+
+            break;
+        }
+        } 
+        break;
+    }
+    //按学号排列
+    case 2: {
+        while (1) {
+            num = 0;
+            ch = 0;
+            printf("请选择排序顺序\n");
+            printf("1.按学号升序排序\n");
             printf("2.按学号降序排序\n");
             printf("3.退出\n");
             scanf("%d", &num);
@@ -933,12 +1094,43 @@ void sort_c(STU_LINK* phead) {
                 break;
             }
         }
+        sort_id(phead);
         switch (num) {
-        case 1: {
+        case 1: {   //学号升序
+            ptmp = phead;
+          
+            printf("学号\t姓名\t性别\t分数\n");
+            while (ptmp->pnext) {
+
+                printf("%d\t%s\t%s\t%.2f\n",
+                    ptmp->pnext->s.id,
+                    ptmp->pnext->s.name,
+                    ptmp->pnext->s.sex,
+                    ptmp->pnext->s.score
+                );
+
+
+                ptmp = ptmp->pnext;
+
+            }
 
             break;
         }
-        case 2: {
+        case 2: {   //成绩降序
+            ptmp = phead;
+            while (ptmp->pnext) {//寻找尾节点
+                ptmp = ptmp->pnext;
+            }
+            printf("学号\t姓名\t性别\t分数\n");
+            while (ptmp->plast) {
+                printf("%d\t%s\t%s\t%.2f\n",
+                    ptmp->s.id,
+                    ptmp->s.name,
+                    ptmp->s.sex,
+                    ptmp->s.score
+                );
+                ptmp = ptmp->plast;
+            }
 
             break;
         }
@@ -946,13 +1138,10 @@ void sort_c(STU_LINK* phead) {
 
             break;
         }
-        } 
+        }
         break;
     }
-    case 2: {
-
-        break;
-    }
+    //退出
     case 3: {
 
         break;
@@ -963,4 +1152,45 @@ void sort_c(STU_LINK* phead) {
     }
     }
  
+}
+
+// 判断字符串是否全为中文
+int isChineseString(char* str) {
+
+    while (*str != '\0') {
+
+
+        if (!(*str > 127 || *str < 0)) {
+            return 0;
+        }
+        str = str + 1;
+    }
+    return 1;
+}
+
+/*
+    功能：计算学号位数
+    参数：int id
+    返回值
+        dig		不等返回输入学号位数
+        id_len	相等返回规定位数
+*/
+int check_stu_id(int id) {
+
+    int dig = 0;
+
+    // 计算学号总位数
+    while (id > 0) {
+        dig++;
+        id /= 10;
+    }
+
+    // 和要求长度校验
+    if (dig < id_len) {
+        return id_len;
+    }
+    else {
+        return dig;
+    }
+
 }

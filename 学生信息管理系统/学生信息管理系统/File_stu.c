@@ -51,7 +51,7 @@ int save_stu_info(STU_LINK* phead) {
 * 返回值：return EOF;		return 0;
 **/
 
-int read_stu_info(STU_LINK* phead) {
+int read_stu_info(STU_LINK** phead) {
 	//打开文件
 	int i = 0;
 	//char n[64] = { 0 };
@@ -63,16 +63,31 @@ int read_stu_info(STU_LINK* phead) {
 	}
 	//读入数据
 	//fscanf(fp, "%s\t%s\t%s\t%s\n",n, n, n, n);
-	do {
+	//do {
+	//	
+	//	pnew = add_link(phead);
+	//	i = fscanf(fp, "%d\t%s\t%s\t%f\n",
+	//		&pnew->s.id,
+	//		pnew->s.name,
+	//		pnew->s.sex,
+	//		&pnew->s.score
+	//	);
+	//} while (i != EOF);
+
+	*phead = (STU_LINK*)malloc(sizeof(STU_LINK));
+	memset(*phead, 0, sizeof(STU_LINK));
+	pnew = *phead;
+	while (fscanf(fp, "%d\t%s\t%s\t%f\n",
+		&pnew->s.id,
+		pnew->s.name,
+		pnew->s.sex,
+		&pnew->s.score
+	) != EOF){
+
 		
-		pnew = add_link(phead);
-		i = fscanf(fp, "%d\t%s\t%s\t%f\n",
-			&pnew->s.id,
-			pnew->s.name,
-			pnew->s.sex,
-			&pnew->s.score
-		);
-	} while (i != EOF);
+		
+		pnew = add_link(*phead);
+	} 
 	
 	//关闭文件
 	fclose(fp);
